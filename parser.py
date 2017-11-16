@@ -1,11 +1,12 @@
 import csv
+#**************************************************
+#Expected to be removed after argparse implemented
 import getopt
+#**************************************************
 import openpyxl #ignored error for unidentified reference here (error happened after importing this script to git)
 import os
 import sys
 import argparse
-
-#testing commit
 
 #input: path to excel workbook file. output: workbook object
 #!What if path doesn't exist?
@@ -58,40 +59,32 @@ def splitRegisterContent(listOfReg):
     return [registerAddress, startBit, numOfBits]
 
 def main(argv):
-    helpString = """
-    Usage: parser.py [INPUT OPTION] <inputFilePath> [SHEET OPTION] <sheetName> [OUTPUT OPTION] <outputFileName>
-    Mandatory arguments to long options are manadatory for short options too.
-    -i, --iFile     Specifies the name of the workbook you wish to import for parsing
-                    Looks in current directory by default but will also accept a path
-    -s, --sName     Specifies the name of the sheet in the workbook you wish to parse
-    -o, --oFile     Specifies the name of the output file you wish to write the parsed data to (overwrites or creates new)
-                    Looks in current directory by default but will also accept a path
-    -h, --help      Display this help and exit
-    
-    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--iFile", help="Specifies the name of the workbook you wish to import for parsing")
+    parser.add_argument("-s", "--sName", help="Specifies the name of the sheet in the workbook you wish to parse")
+    parser.add_argument("-o", "--oName", help="Specifies the name of the output file you wish to write the parsed data to")
+    args = parser.parse_args()
 
-    inputFileName = ''
-    sheetName = ''
-    outputFileName = ''
+    inputFileName = args.iFile
+    sheetName = args.sName
+    outputFileName = args.oName
+
+    pds = []
+    sheet = []
     try:
-        opts, args = getopt.getopt(argv, 'hi:s:o:', ['help', 'iFile=', 'sName=', 'oName='])
-    except getopt.GetoptError:
-        print(getopt.GetoptError.msg)
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h' or opt == '--help':
-            print(helpString)
-            sys.exit()
-        elif opt in ('-i', '--iFile'):
-            inputFileName = arg
-        elif opt in ('-s', '--sName'):
-            sheetName = arg
-        elif opt in ('-o', '--oName'):
-            outputFileName = arg
+        pds = getWorkbook(inputFileName)
+    except FileNotFoundError as err:
+        print(err)
+        exit(1)
+    except PermissionError as err:
+        print(err)
+        exit(1)
+    try:
+        sheet = getSheet(pds, sheetName)
+    except KeyError as err:
+        print(err)
+        exit(1)
 
-    #get the sheet of interest from the pds
-    pds = getWorkbook(inputFileName)
-    sheet = getSheet(pds, sheetName)
     sheetAsTuple = tuple(sheet.columns)
 
     #need to create a list with columns full of values, not cell objects
@@ -112,8 +105,16 @@ def main(argv):
        sheetValues[3], sheetValues[5], sheetValues[7], sheetValues[8],
                     sheetValues[9], sheetValues[10], sheetValues[11], sheetValues[13])
 
-    makeCSV(inputFileName, sheetName, outputFileName, data)
+    try:
+        makeCSV(inputFileName, sheetName, outputFileName, data)
+    except FileNotFoundError as err:
+        print(err)
+        exit(1)
+    except PermissionError as err:
+        print(err)
+        exit(1)
 
+    exit(0)
 #this only executes if modbusMapConversion.py is executed, not imported
 if __name__ == "__main__":
     main(sys.argv[1:])
