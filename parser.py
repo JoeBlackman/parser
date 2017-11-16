@@ -74,16 +74,19 @@ def main(argv):
     try:
         pds = getWorkbook(inputFileName)
     except FileNotFoundError as err:
-        print(err)
-        exit(1)
+        #print(err)
+        exit(err)
     except PermissionError as err:
-        print(err)
-        exit(1)
+        #print(err)
+        exit(err)
+    except TypeError as err:
+        #print(err)
+        exit(err)
     try:
         sheet = getSheet(pds, sheetName)
     except KeyError as err:
-        print(err)
-        exit(1)
+        #print(err)
+        exit(err)
 
     sheetAsTuple = tuple(sheet.columns)
 
@@ -108,13 +111,17 @@ def main(argv):
     try:
         makeCSV(inputFileName, sheetName, outputFileName, data)
     except FileNotFoundError as err:
-        print(err)
-        exit(1)
+        #print(err)
+        exit(err)
     except PermissionError as err:
-        print(err)
-        exit(1)
+        #print(err)
+        exit(err)
+    except TypeError as err:
+        #print(err)
+        exit(err)
 
-    exit(0)
+    print("OK")
+    exit()
 #this only executes if modbusMapConversion.py is executed, not imported
 if __name__ == "__main__":
     main(sys.argv[1:])
