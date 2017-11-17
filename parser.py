@@ -1,27 +1,20 @@
 import csv
-#**************************************************
-#Expected to be removed after argparse implemented
-import getopt
-#**************************************************
 import openpyxl #ignored error for unidentified reference here (error happened after importing this script to git)
 import os
 import sys
 import argparse
 
 #input: path to excel workbook file. output: workbook object
-#!What if path doesn't exist?
 def getWorkbook(workbookName):
     workbook = openpyxl.load_workbook(workbookName)
     return workbook
 
 #input: workbook object, name of sheet in workbook object. output: sheet object
-#!What if sheet doesn't exist?
 def getSheet(workbook, sheetName):
     sheet = workbook.get_sheet_by_name(sheetName)
     return sheet
 
 #input: input file path, sheet name, output file path, data to be written. csv created or overwritten to output file path
-#!what if output file path doesn't exist?
 def makeCSV(inputFileName, sheetName, outputFileName, table):
     with open(outputFileName, 'w', newline='') as f:
         writer = csv.writer(f)
