@@ -1,8 +1,8 @@
 import csv
 import openpyxl #ignored error for unidentified reference here (error happened after importing this script to git)
-import os
 import sys
 import argparse
+from datetime import date
 
 #input: path to excel workbook file. output: workbook object
 def getWorkbook(workbookName):
@@ -20,6 +20,7 @@ def makeCSV(inputFileName, sheetName, outputFileName, table):
         writer = csv.writer(f)
         writer.writerow([inputFileName]) #add a header with the path used to create this csv
         writer.writerow([sheetName]) #add header with the sheet name used to create this csv
+        writer.writerow([date.today()])
         writer.writerow([''])
         for row in table: #for each row of data, write it to the csv
             writer.writerow(row)
